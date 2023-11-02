@@ -31,7 +31,6 @@ func testMain(m *testing.M) int {
 	}
 	nc, cleanup, err := ttr.SetupTempNamespace(
 		cc,
-		ott.StartNexus(),
 		ott.InstallODSPipeline(nil),
 		ttr.InstallTaskFromPath(
 			filepath.Join(rootPath, "build/tasks/logs.yaml"),
