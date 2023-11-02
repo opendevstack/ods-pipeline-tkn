@@ -1,0 +1,29 @@
+// File is generated; DO NOT EDIT.
+
+= ods-pipeline-tkn-logs
+
+The purpose of this task is to fetch the logs of the pipeline run.
+
+
+== Parameters
+
+[cols="1,1,2"]
+|===
+| Parameter | Default | Description
+
+| working-dir
+| .
+| Working directory. The path must be relative to the root of the repository,
+without leading `./` and trailing `/`.
+
+
+
+| target
+| pipeline-run.log
+| Target file where to store pipeline run log.
+
+|===
+
+== Results
+
+N/A

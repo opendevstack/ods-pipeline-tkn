@@ -1,0 +1,59 @@
+# File is generated; DO NOT EDIT.
+
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: ods-pipeline-tkn-logs
+spec:
+  description: |
+    Gather pipeline run logs.
+
+    See https://github.com/opendevstack/ods-pipeline-tkn/blob/vlatest/docs/tasks/logs.adoc
+  params:
+    - name: working-dir
+      description: |
+        Working directory. The path must be relative to the root of the repository,
+        without leading `./` and trailing `/`.
+      type: string
+      default: "."
+    - name: target
+      description: >-
+        Target file where to store pipeline run log.
+      type: string
+      default: "pipeline-run.log"
+  steps:
+    - name: gather-logs
+      # Image is built from build/images/Dockerfile.tkn-toolset.
+      image: 'ghcr.io/opendevstack/ods-pipeline-tkn/tkn-toolset:latest'
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PIPELINERUN_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tekton.dev/pipelineRun']
+        - name: TASKRUN_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tekton.dev/taskRun']
+        - name: DEBUG
+          valueFrom:
+            configMapKeyRef:
+              key: debug
+              name: ods-pipeline
+      resources:
+        {}
+      script: |
+        target_dir="$(dirname "$(params.target)")"
+        mkdir -p "${target_dir}"
+        if [ "${PIPELINERUN_NAME}" != "" ]; then
+          tkn -n ${NAMESPACE} pipelinerun logs ${PIPELINERUN_NAME} > $(params.target)
+        else
+          tkn -n ${NAMESPACE} taskrun logs ${TASKRUN_NAME} > $(params.target)
+        fi
+        
+      workingDir: $(workspaces.source.path)
+  workspaces:
+    - name: source

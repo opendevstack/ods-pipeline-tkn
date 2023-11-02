@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: ods-pipeline-tkn-logs
+spec:
+  description: |
+    Gather pipeline run logs.
+
+    See https://github.com/opendevstack/ods-pipeline-tkn/blob/v{{.Version}}/docs/tasks/logs.adoc
+  params:
+    - name: working-dir
+      description: |
+        Working directory. The path must be relative to the root of the repository,
+        without leading `./` and trailing `/`.
+      type: string
+      default: "."
+    - name: target
+      description: >-
+        Target file where to store pipeline run log.
+      type: string
+      default: "pipeline-run.log"
+  steps:
+    - name: gather-logs
+      # Image is built from build/images/Dockerfile.tkn-toolset.
+      image: '{{.ImageRepository}}/tkn-toolset:{{.Version}}'
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PIPELINERUN_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tekton.dev/pipelineRun']
+        - name: DEBUG
+          valueFrom:
+            configMapKeyRef:
+              key: debug
+              name: ods-pipeline
+      resources:
+        {}
+      script: |
+        if [ "${PIPELINERUN_NAME}" = "" ]; then
+          echo "Label tekton.dev/pipelineRun is missing, cannot gather logs."
+          exit 1
+        fi
+        target_dir="$(dirname "$(params.target)")"
+        mkdir -p "${target_dir}"
+        tkn -n ${NAMESPACE} pipelinerun logs ${PIPELINERUN_NAME} > $(params.target)
+      workingDir: $(workspaces.source.path)
+  workspaces:
+    - name: source
