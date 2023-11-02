@@ -34,10 +34,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.labels['tekton.dev/pipelineRun']
-        - name: TASKRUN_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.labels['tekton.dev/taskRun']
         - name: DEBUG
           valueFrom:
             configMapKeyRef:
@@ -46,14 +42,13 @@ spec:
       resources:
         {}
       script: |
+        if [ "${PIPELINERUN_NAME}" = "" ]; then
+          echo "Label tekton.dev/pipelineRun is missing, cannot gather logs."
+          exit 1
+        fi
         target_dir="$(dirname "$(params.target)")"
         mkdir -p "${target_dir}"
-        if [ "${PIPELINERUN_NAME}" != "" ]; then
-          tkn -n ${NAMESPACE} pipelinerun logs ${PIPELINERUN_NAME} > $(params.target)
-        else
-          tkn -n ${NAMESPACE} taskrun logs ${TASKRUN_NAME} > $(params.target)
-        fi
-        
+        tkn -n ${NAMESPACE} pipelinerun logs ${PIPELINERUN_NAME} > $(params.target)
       workingDir: $(workspaces.source.path)
   workspaces:
     - name: source
