@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - task/sleep
   pull_request:
 
 env:
