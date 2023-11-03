@@ -44,6 +44,7 @@ spec:
       script: |
         if [ "${PIPELINERUN_NAME}" = "" ]; then
           echo "Label tekton.dev/pipelineRun is missing, cannot gather logs."
+          echo "This task is intended to be run as part of a PipelineRun."
           exit 1
         fi
         target_dir="$(dirname "$(params.target)")"
