@@ -3,5 +3,6 @@ RUN curl -LO https://github.com/tektoncd/cli/releases/download/v0.32.2/tkn_0.32.
     tar xvzf tkn_0.32.2_Linux_x86_64.tar.gz -C /usr/local/bin/ tkn
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal
-
 COPY --from=builder /usr/local/bin/tkn /usr/local/bin/tkn
+VOLUME /workspace/source
+USER 1001
