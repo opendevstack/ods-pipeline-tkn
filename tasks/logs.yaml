@@ -8,7 +8,7 @@ spec:
   description: |
     Gather pipeline run logs.
 
-    See https://github.com/opendevstack/ods-pipeline-tkn/blob/vlatest/docs/tasks/logs.adoc
+    See https://github.com/opendevstack/ods-pipeline-tkn/blob/v0.1.0/docs/tasks/logs.adoc
   params:
     - name: working-dir
       description: |
@@ -24,7 +24,7 @@ spec:
   steps:
     - name: gather-logs
       # Image is built from build/images/Dockerfile.tkn-toolset.
-      image: 'ghcr.io/opendevstack/ods-pipeline-tkn/tkn-toolset:latest'
+      image: 'ghcr.io/opendevstack/ods-pipeline-tkn/tkn-toolset:0.1.0'
       env:
         - name: NAMESPACE
           valueFrom:
